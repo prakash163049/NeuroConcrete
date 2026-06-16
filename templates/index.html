@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuroConcrete – AI Concrete Strength Predictor</title>
+  <meta name="description"
+    content="NeuroConcrete uses an Extra Trees Regressor ML model with 92.12% accuracy to predict concrete compressive strength from mix design parameters in real time." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+
+<body>
+
+  <!-- ── Particle Canvas ── -->
+  <canvas id="particle-canvas"></canvas>
+
+  <!-- ── Animated Background ── -->
+  <div class="bg-canvas">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="blob blob-4"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <!-- ── Navbar ── -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-brand">
+      <div class="nav-logo">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+          <rect width="36" height="36" rx="10" fill="url(#logoGrad)" />
+          <path d="M9 27V13.5l9-4.5 9 4.5V27" stroke="white" stroke-width="1.8" stroke-linejoin="round" />
+          <path d="M13 27v-7h10v7" stroke="white" stroke-width="1.8" stroke-linejoin="round" />
+          <circle cx="18" cy="11" r="2.2" fill="white" opacity="0.95" />
+          <defs>
+            <linearGradient id="logoGrad" x1="0" y1="0" x2="36" y2="36">
+              <stop offset="0%" stop-color="#6366f1" />
+              <stop offset="100%" stop-color="#06b6d4" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <span class="nav-title">Neuro<span class="accent">Concrete</span></span>
+    </div>
+    <div class="nav-links">
+      <a href="#predictor" class="nav-link">Predictor</a>
+      <a href="#how-it-works" class="nav-link">How It Works</a>
+      <a href="#model-insight" class="nav-link">Model</a>
+      <a href="#grades" class="nav-link">Grades</a>
+    </div>
+    <div class="nav-badge">
+      <span class="pulse-dot"></span>
+      <span>92.12% Accuracy · Live</span>
+    </div>
+  </nav>
+
+  <!-- ══════════════════════════════════════════════
+     HERO SECTION
+══════════════════════════════════════════════ -->
+  <section class="hero" id="home">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+        </svg>
+        Extra Trees Regressor · 92.12% R² Accuracy
+      </div>
+      <h1 class="hero-title">
+        Predict Concrete<br />
+        <span class="gradient-text">Compressive Strength</span><br />
+        <span class="hero-sub-word">with AI Precision</span>
+      </h1>
+      <p class="hero-subtitle">
+        NeuroConcrete harnesses an ensemble machine learning model trained on
+        <strong>1030 real-world concrete mix samples</strong> to deliver instant,
+        engineering-grade strength predictions from your mix design parameters.
+      </p>
+
+      <!-- Live counter strip -->
+      <div class="hero-counters">
+        <div class="counter-item">
+          <span class="counter-val" data-target="92.12" data-suffix="%">0%</span>
+          <span class="counter-lbl">R² Score</span>
+        </div>
+        <div class="counter-sep"></div>
+        <div class="counter-item">
+          <span class="counter-val" data-target="300" data-suffix="">0</span>
+          <span class="counter-lbl">Decision Trees</span>
+        </div>
+        <div class="counter-sep"></div>
+        <div class="counter-item">
+          <span class="counter-val" data-target="1030" data-suffix="">0</span>
+          <span class="counter-lbl">Training Samples</span>
+        </div>
+        <div class="counter-sep"></div>
+        <div class="counter-item">
+          <span class="counter-val" data-target="8" data-suffix="">0</span>
+          <span class="counter-lbl">Mix Features</span>
+        </div>
+      </div>
+
+      <div class="hero-cta-row">
+        <a href="#predictor" class="cta-btn primary" id="try-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+          </svg>
+          <span>Start Predicting</span>
+        </a>
+        <a href="#how-it-works" class="cta-btn secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 8v4l3 3" />
+          </svg>
+          <span>How It Works</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- 3D-ish model visualization -->
+    <div class="hero-visual">
+      <div class="model-card">
+        <div class="model-card-glow"></div>
+        <div class="model-card-header">
+          <div class="model-dot green"></div>
+          <div class="model-dot yellow"></div>
+          <div class="model-dot red"></div>
+          <span class="model-filename">extra_trees_regressor.py</span>
+        </div>
+        <pre class="model-code"><span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> <span class="cls">ExtraTreesRegressor</span>
+
+model = <span class="cls">ExtraTreesRegressor</span>(
+  n_estimators  = <span class="num">300</span>,
+  max_features  = <span class="str">"auto"</span>,
+  random_state  = <span class="num">42</span>,
+  n_jobs        = <span class="num">-1</span>
+)
+
+model.<span class="fn">fit</span>(X_train, y_train)
+
+<span class="cm"># R² Score on test set</span>
+r2 = <span class="num">0.9212</span>  <span class="cm"># 92.12%</span></pre>
+        <div class="model-card-footer">
+          <div class="perf-bar-row">
+            <span class="perf-label">Accuracy</span>
+            <div class="perf-bar">
+              <div class="perf-fill" style="width:92.12%"></div>
+            </div>
+            <span class="perf-val">92.12%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floating feature chips -->
+      <div class="feat-chip fc1">Age <span>36.85%</span></div>
+      <div class="feat-chip fc2">Cement <span>25.75%</span></div>
+      <div class="feat-chip fc3">Water <span>8.28%</span></div>
+      <div class="feat-chip fc4">SP <span>9.50%</span></div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+     HOW IT WORKS
+══════════════════════════════════════════════ -->
+  <section class="hiw-section" id="how-it-works">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">Process Overview</div>
+        <h2 class="section-title">How <span class="gradient-text">NeuroConcrete</span> Works</h2>
+        <p class="section-subtitle">From concrete mix parameters to strength prediction in 4 steps</p>
+      </div>
+
+      <div class="hiw-steps">
+        <div class="hiw-step" data-step="1">
+          <div class="step-connector left-conn"></div>
+          <div class="step-icon-wrap">
+            <div class="step-number">01</div>
+            <div class="step-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <path d="M3 9h18M9 21V9" />
+              </svg>
+            </div>
+          </div>
+          <div class="step-body">
+            <h3>Input Mix Parameters</h3>
+            <p>Enter the 8 concrete mix design parameters — either via the precision form or interactive sliders. Choose
+              from presets like M25, M40 or M60 grades for instant exploration.</p>
+            <div class="step-tags">
+              <span>Cement</span><span>Water</span><span>Slag</span><span>Fly Ash</span><span>+4 more</span>
+            </div>
+          </div>
+          <div class="step-connector right-conn"></div>
+        </div>
+
+        <div class="hiw-step" data-step="2">
+          <div class="step-connector left-conn"></div>
+          <div class="step-icon-wrap">
+            <div class="step-number">02</div>
+            <div class="step-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+              </svg>
+            </div>
+          </div>
+          <div class="step-body">
+            <h3>Feature Vector Assembly</h3>
+            <p>Values are validated against training data bounds and assembled into a normalised 8-dimensional feature
+              vector, then sent to the Flask API via JSON.</p>
+            <div class="feature-vector-anim">
+              <div class="fv-bracket">[</div>
+              <div class="fv-vals">
+                <span class="fv-val" style="animation-delay:0s">350</span>
+                <span class="fv-sep">,</span>
+                <span class="fv-val" style="animation-delay:.15s">0</span>
+                <span class="fv-sep">,</span>
+                <span class="fv-val" style="animation-delay:.3s">0</span>
+                <span class="fv-sep">,</span>
+                <span class="fv-val" style="animation-delay:.45s">185</span>
+                <span class="fv-sep">…</span>
+              </div>
+              <div class="fv-bracket">]</div>
+            </div>
+          </div>
+          <div class="step-connector right-conn"></div>
+        </div>
+
+        <div class="hiw-step" data-step="3">
+          <div class="step-connector left-conn"></div>
+          <div class="step-icon-wrap">
+            <div class="step-number">03</div>
+            <div class="step-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="3" />
+                <path
+                  d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" />
+              </svg>
+            </div>
+          </div>
+          <div class="step-body">
+            <h3>Extra Trees Ensemble Inference</h3>
+            <p>300 randomised decision trees each independently predict the compressive strength. Their outputs are
+              averaged to produce a robust, low-variance final prediction.</p>
+            <div class="tree-animation">
+              <div class="tree-visual">
+                <div class="tree-row row-1">
+                  <div class="tree-node root"></div>
+                </div>
+                <div class="tree-row row-2">
+                  <div class="tree-node l2"></div>
+                  <div class="tree-node l2"></div>
+                </div>
+                <div class="tree-row row-3">
+                  <div class="tree-node leaf"></div>
+                  <div class="tree-node leaf"></div>
+                  <div class="tree-node leaf active"></div>
+                  <div class="tree-node leaf"></div>
+                </div>
+              </div>
+              <div class="tree-dots">×300</div>
+              <div class="tree-avg">avg → <strong>MPa</strong></div>
+            </div>
+          </div>
+          <div class="step-connector right-conn"></div>
+        </div>
+
+        <div class="hiw-step" data-step="4">
+          <div class="step-connector left-conn"></div>
+          <div class="step-icon-wrap">
+            <div class="step-number">04</div>
+            <div class="step-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+              </svg>
+            </div>
+          </div>
+          <div class="step-body">
+            <h3>Result &amp; Grade Classification</h3>
+            <p>The predicted compressive strength (MPa) is returned and classified into a concrete grade
+              (Low/Medium/High/Ultra-High), visualised on an animated gauge with a full mix summary.</p>
+            <div class="step-tags">
+              <span class="tag-low">Low &lt;20 MPa</span>
+              <span class="tag-med">Medium 20–40</span>
+              <span class="tag-high">High 40–60</span>
+              <span class="tag-ultra">Ultra &gt;60</span>
+            </div>
+          </div>
+          <div class="step-connector right-conn hidden"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+     PREDICTOR SECTION
+══════════════════════════════════════════════ -->
+  <section class="predictor-section" id="predictor">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">Interactive Tool</div>
+        <h2 class="section-title">Mix Design <span class="gradient-text">Predictor</span></h2>
+        <p class="section-subtitle">Two input modes — choose what suits your workflow</p>
+      </div>
+
+      <!-- Tab Switcher -->
+      <div class="tab-switcher" role="tablist">
+        <button class="tab-btn active" id="tab-form" role="tab" aria-selected="true" onclick="switchTab('form')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <path d="M3 9h18M9 21V9" />
+          </svg>
+          Form Input
+        </button>
+        <button class="tab-btn" id="tab-slider" role="tab" aria-selected="false" onclick="switchTab('slider')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="4" y1="6" x2="20" y2="6" />
+            <line x1="4" y1="12" x2="20" y2="12" />
+            <line x1="4" y1="18" x2="20" y2="18" />
+            <circle cx="9" cy="6" r="2.5" fill="currentColor" stroke="none" />
+            <circle cx="16" cy="12" r="2.5" fill="currentColor" stroke="none" />
+            <circle cx="11" cy="18" r="2.5" fill="currentColor" stroke="none" />
+          </svg>
+          Slider Control
+        </button>
+      </div>
+
+      <div class="predictor-layout">
+        <!-- Left: Input -->
+        <div class="input-panel">
+
+          <!-- FORM TAB -->
+          <div class="tab-content active" id="content-form">
+            <form id="form-inputs" class="form-grid" novalidate>
+              <div class="form-group" data-field="cement">
+                <label for="f-cement">
+                  <span class="fi-dot" style="background:#6366f1"></span>
+                  Cement <span class="unit-tag">kg/m³</span>
+                </label>
+                <div class="input-wrap">
+                  <input type="number" id="f-cement" name="cement" min="100" max="540" step="1"
+                    placeholder="100 – 540" />
+                </div>
+                <div class="form-hint">Most critical binder · Importance: 25.75%</div>
+              </div>
+
+              <div class="form-group" data-field="slag">
+                <label for="f-slag">
+                  <span class="fi-dot" style="background:#8b5cf6"></span>
+                  Blast Furnace Slag <span class="unit-tag">kg/m³</span>
+                </label>
+                <div class="input-wrap">
+                  <input type="number" id="f-slag" name="slag" min="0" max="360" step="1" placeholder="0 – 360" />
+                </div>
+                <div class="form-hint">Supplementary binder · Importance: 8.19%</div>
+              </div>
+
+              <div class="form-group" data-field="ash">
+                <label for="f-ash">
+                  <span class="fi-dot" style="background:#06b6d4"></span>
+                  Fly Ash <span class="unit-tag">kg/m³</span>
+                </label>
+                <div class="input-wrap">
+                  <input type="number" id="f-ash" name="ash" min="0" max="200" step="1" placeholder="0 – 200" />
+                </div>
+                <div class="form-hint">Pozzolanic additive · Importance: 3.48%</div>
+              </div>
+
+              <div class="form-group" data-field="water">
+                <label for="f-water">
+                  <span class="fi-dot" style="background:#0ea5e9"></span>
+                  Water <span class="unit-tag">kg/m³</span>
+                </label>
+                <div class="input-wrap">
+                  <input type="number" id="f-water" name="water" min="120" max="250" step="1" placeholder="120 – 250" />
+                </div>
+                <div class="form-hint">W/C ratio control · Importance: 8.28%</div>
+              </div>
+
+              <div class="form-group" data-field="superplastic">
+                <label for="f-superplastic">
+                  <span class="fi-dot" style="background:#10b981"></span>
+                  Superplasticizer <span class="unit-tag">kg/m³</span>
+                </label>
+                <div class="input-wrap">
+                  <input type="number" id="f-superplastic" name="superplastic" min="0" max="32" step="0.1"
+                    placeholder="0 – 32" />
+                </div>
+                <div class="form-hint">Workability enhancer · Importance: 9.50%</div>
+              </div>
+
+              <div class="form-group" data-field="coarseagg">
+                <label for="f-coarseagg">
+                  <span class="fi-dot" style="background:#f59e0b"></span>
+                  Coarse Aggregate <span class="unit-tag">kg/m³</span>
+                </label>
+                <div class="input-wrap">
+                  <input type="number" id="f-coarseagg" name="coarseagg" min="800" max="1145" step="1"
+                    placeholder="800 – 1145" />
+                </div>
+                <div class="form-hint">Gravel / crushed stone · Importance: 3.13%</div>
+              </div>
+
+              <div class="form-group" data-field="fineagg">
+                <label for="f-fineagg">
+                  <span class="fi-dot" style="background:#f97316"></span>
+                  Fine Aggregate <span class="unit-tag">kg/m³</span>
+                </label>
+                <div class="input-wrap">
+                  <input type="number" id="f-fineagg" name="fineagg" min="594" max="993" step="1"
+                    placeholder="594 – 993" />
+                </div>
+                <div class="form-hint">River sand · Importance: 4.81%</div>
+              </div>
+
+              <div class="form-group" data-field="age">
+                <label for="f-age">
+                  <span class="fi-dot" style="background:#ef4444"></span>
+                  Curing Age <span class="unit-tag">days</span>
+                </label>
+                <div class="input-wrap">
+                  <input type="number" id="f-age" name="age" min="1" max="365" step="1" placeholder="1 – 365" />
+                </div>
+                <div class="form-hint">Top predictor · Importance: <strong>36.85%</strong></div>
+              </div>
+            </form>
+          </div>
+
+          <!-- SLIDER TAB -->
+          <div class="tab-content" id="content-slider">
+            <div class="slider-grid">
+              <div class="slider-group" data-field="cement">
+                <div class="slider-header">
+                  <span class="slider-label"><span class="fi-dot" style="background:#6366f1"></span> Cement</span>
+                  <div class="slider-val-wrap">
+                    <input type="number" id="sv-cement" class="slider-num" min="100" max="540" value="250" />
+                    <span class="slider-unit">kg/m³</span>
+                  </div>
+                </div>
+                <div class="range-wrap">
+                  <input type="range" id="s-cement" class="range-input" min="100" max="540" value="250" step="1"
+                    data-target="sv-cement" />
+                </div>
+                <div class="slider-limits"><span>100 kg/m³</span><span>540 kg/m³</span></div>
+              </div>
+
+              <div class="slider-group" data-field="slag">
+                <div class="slider-header">
+                  <span class="slider-label"><span class="fi-dot" style="background:#8b5cf6"></span> Slag</span>
+                  <div class="slider-val-wrap">
+                    <input type="number" id="sv-slag" class="slider-num" min="0" max="360" value="0" />
+                    <span class="slider-unit">kg/m³</span>
+                  </div>
+                </div>
+                <div class="range-wrap">
+                  <input type="range" id="s-slag" class="range-input" min="0" max="360" value="0" step="1"
+                    data-target="sv-slag" />
+                </div>
+                <div class="slider-limits"><span>0</span><span>360 kg/m³</span></div>
+              </div>
+
+              <div class="slider-group" data-field="ash">
+                <div class="slider-header">
+                  <span class="slider-label"><span class="fi-dot" style="background:#06b6d4"></span> Fly Ash</span>
+                  <div class="slider-val-wrap">
+                    <input type="number" id="sv-ash" class="slider-num" min="0" max="200" value="0" />
+                    <span class="slider-unit">kg/m³</span>
+                  </div>
+                </div>
+                <div class="range-wrap">
+                  <input type="range" id="s-ash" class="range-input" min="0" max="200" value="0" step="1"
+                    data-target="sv-ash" />
+                </div>
+                <div class="slider-limits"><span>0</span><span>200 kg/m³</span></div>
+              </div>
+
+              <div class="slider-group" data-field="water">
+                <div class="slider-header">
+                  <span class="slider-label"><span class="fi-dot" style="background:#0ea5e9"></span> Water</span>
+                  <div class="slider-val-wrap">
+                    <input type="number" id="sv-water" class="slider-num" min="120" max="250" value="180" />
+                    <span class="slider-unit">kg/m³</span>
+                  </div>
+                </div>
+                <div class="range-wrap">
+                  <input type="range" id="s-water" class="range-input" min="120" max="250" value="180" step="1"
+                    data-target="sv-water" />
+                </div>
+                <div class="slider-limits"><span>120</span><span>250 kg/m³</span></div>
+              </div>
+
+              <div class="slider-group" data-field="superplastic">
+                <div class="slider-header">
+                  <span class="slider-label"><span class="fi-dot" style="background:#10b981"></span>
+                    Superplasticizer</span>
+                  <div class="slider-val-wrap">
+                    <input type="number" id="sv-superplastic" class="slider-num" min="0" max="32" value="5"
+                      step="0.1" />
+                    <span class="slider-unit">kg/m³</span>
+                  </div>
+                </div>
+                <div class="range-wrap">
+                  <input type="range" id="s-superplastic" class="range-input" min="0" max="32" value="5" step="0.1"
+                    data-target="sv-superplastic" />
+                </div>
+                <div class="slider-limits"><span>0</span><span>32 kg/m³</span></div>
+              </div>
+
+              <div class="slider-group" data-field="coarseagg">
+                <div class="slider-header">
+                  <span class="slider-label"><span class="fi-dot" style="background:#f59e0b"></span> Coarse Agg.</span>
+                  <div class="slider-val-wrap">
+                    <input type="number" id="sv-coarseagg" class="slider-num" min="800" max="1145" value="970" />
+                    <span class="slider-unit">kg/m³</span>
+                  </div>
+                </div>
+                <div class="range-wrap">
+                  <input type="range" id="s-coarseagg" class="range-input" min="800" max="1145" value="970" step="1"
+                    data-target="sv-coarseagg" />
+                </div>
+                <div class="slider-limits"><span>800</span><span>1145 kg/m³</span></div>
+              </div>
+
+              <div class="slider-group" data-field="fineagg">
+                <div class="slider-header">
+                  <span class="slider-label"><span class="fi-dot" style="background:#f97316"></span> Fine Agg.</span>
+                  <div class="slider-val-wrap">
+                    <input type="number" id="sv-fineagg" class="slider-num" min="594" max="993" value="794" />
+                    <span class="slider-unit">kg/m³</span>
+                  </div>
+                </div>
+                <div class="range-wrap">
+                  <input type="range" id="s-fineagg" class="range-input" min="594" max="993" value="794" step="1"
+                    data-target="sv-fineagg" />
+                </div>
+                <div class="slider-limits"><span>594</span><span>993 kg/m³</span></div>
+              </div>
+
+              <div class="slider-group" data-field="age">
+                <div class="slider-header">
+                  <span class="slider-label"><span class="fi-dot" style="background:#ef4444"></span> Curing Age</span>
+                  <div class="slider-val-wrap">
+                    <input type="number" id="sv-age" class="slider-num" min="1" max="365" value="28" />
+                    <span class="slider-unit">days</span>
+                  </div>
+                </div>
+                <div class="range-wrap">
+                  <input type="range" id="s-age" class="range-input" min="1" max="365" value="28" step="1"
+                    data-target="sv-age" />
+                </div>
+                <div class="slider-limits"><span>1 day</span><span>365 days</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Presets + Actions -->
+          <div class="preset-row">
+            <span class="preset-label-inline">Quick Presets:</span>
+            <button class="preset-pill" onclick="loadPreset('standard')">M25 Standard</button>
+            <button class="preset-pill" onclick="loadPreset('high')">M60 High Strength</button>
+            <button class="preset-pill" onclick="loadPreset('eco')">Eco Blend</button>
+            <button class="preset-pill" onclick="loadPreset('uhpc')">UHPC</button>
+          </div>
+
+          <div class="action-row">
+            <button class="btn-reset" id="btn-reset" onclick="resetInputs()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                <path d="M3 3v5h5" />
+              </svg>
+              Reset
+            </button>
+            <button class="btn-predict" id="btn-predict" onclick="predict()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+              </svg>
+              <span id="predict-label">Predict Strength</span>
+              <div class="btn-shimmer"></div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Result -->
+        <div class="result-panel" id="result-panel">
+          <div class="result-idle" id="result-idle">
+            <div class="idle-icon">
+              <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+              </svg>
+            </div>
+            <h3>Ready to Predict</h3>
+            <p>Fill in mix parameters or choose a preset to instantly see predicted compressive strength.</p>
+            <div class="idle-tips">
+              <div class="tip-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path
+                    d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                </svg>
+                Higher cement + age = higher strength
+              </div>
+              <div class="tip-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path
+                    d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                </svg>
+                Lower water reduces w/c ratio, increases strength
+              </div>
+              <div class="tip-item">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path
+                    d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                </svg>
+                Superplasticizer improves workability without adding water
+              </div>
+            </div>
+          </div>
+
+          <div class="result-loading" id="result-loading" style="display:none;">
+            <div class="loader-ring">
+              <svg width="72" height="72" viewBox="0 0 80 80">
+                <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(99,102,241,0.1)" stroke-width="6" />
+                <circle cx="40" cy="40" r="34" fill="none" stroke="url(#lg1)" stroke-width="6" stroke-linecap="round"
+                  stroke-dasharray="213" stroke-dashoffset="160">
+                  <animateTransform attributeName="transform" type="rotate" from="0 40 40" to="360 40 40" dur="0.9s"
+                    repeatCount="indefinite" />
+                </circle>
+                <defs>
+                  <linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#6366f1" />
+                    <stop offset="100%" stop-color="#06b6d4" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+            <p class="loading-text">Running ensemble inference across 300 trees…</p>
+          </div>
+
+          <div class="result-output" id="result-output" style="display:none;">
+            <div class="result-header">
+              <div class="result-icon-wrap">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                </svg>
+              </div>
+              <div>
+                <div class="result-label">Predicted Compressive Strength</div>
+                <div class="result-grade" id="result-grade-label"></div>
+              </div>
+            </div>
+
+            <div class="result-main">
+              <div class="result-value">
+                <span class="r-number" id="r-number">--</span>
+                <span class="r-unit">MPa</span>
+              </div>
+              <div class="result-desc" id="result-desc"></div>
+            </div>
+
+            <div class="gauge-container">
+              <svg class="gauge-svg" viewBox="0 0 220 130" width="220" height="130">
+                <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="14"
+                  stroke-linecap="round" />
+                <path id="gauge-arc" d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="url(#gaugeGrad)"
+                  stroke-width="14" stroke-linecap="round" stroke-dasharray="283" stroke-dashoffset="283" />
+                <text id="gauge-label" x="110" y="98" text-anchor="middle" fill="white" font-size="24" font-weight="800"
+                  font-family="Space Grotesk">--</text>
+                <text x="110" y="115" text-anchor="middle" fill="rgba(255,255,255,0.45)" font-size="10"
+                  font-family="Inter">MPa (max scale 100)</text>
+                <text x="20" y="128" fill="rgba(255,255,255,0.35)" font-size="9" font-family="Inter">0</text>
+                <text x="187" y="128" fill="rgba(255,255,255,0.35)" font-size="9" font-family="Inter">100</text>
+                <defs>
+                  <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stop-color="#6366f1" />
+                    <stop offset="50%" stop-color="#06b6d4" />
+                    <stop offset="100%" stop-color="#10b981" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+
+            <div class="grade-card" id="grade-card">
+              <div class="grade-badge" id="grade-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                </svg>
+                <span id="grade-text"></span>
+              </div>
+              <span id="grade-desc"></span>
+            </div>
+
+            <div class="input-summary">
+              <div class="summary-title">Mix Design Summary</div>
+              <div class="summary-grid" id="summary-grid"></div>
+            </div>
+
+            <button class="btn-new" onclick="resetResult()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                <path d="M3 3v5h5" />
+              </svg>
+              New Prediction
+            </button>
+          </div>
+
+          <div class="result-error" id="result-error" style="display:none;">
+            <div class="error-icon">⚠️</div>
+            <h3>Prediction Failed</h3>
+            <p id="error-msg">Please check your inputs and try again.</p>
+            <button class="btn-new" onclick="resetResult()">Try Again</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+     MODEL INSIGHT SECTION
+══════════════════════════════════════════════ -->
+  <section class="model-section" id="model-insight">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">Model Intelligence</div>
+        <h2 class="section-title">Inside the <span class="gradient-text">Extra Trees</span> Model</h2>
+        <p class="section-subtitle">What the model learned from 1030 real concrete mix samples</p>
+      </div>
+
+      <div class="model-insight-grid">
+        <!-- Feature Importance Chart -->
+        <div class="insight-card fi-card">
+          <div class="card-header">
+            <div class="card-icon purple">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <line x1="18" y1="20" x2="18" y2="10" />
+                <line x1="12" y1="20" x2="12" y2="4" />
+                <line x1="6" y1="20" x2="6" y2="14" />
+              </svg>
+            </div>
+            <h3>Feature Importance</h3>
+            <span class="card-badge">Gini Importance</span>
+          </div>
+          <p class="card-desc">Which mix parameters drive strength predictions most — computed from 300 trees.</p>
+          <div class="fi-bars">
+            <div class="fi-bar-item">
+              <div class="fi-bar-label">
+                <span class="fi-dot" style="background:#ef4444"></span>
+                <span>Curing Age</span>
+                <span class="fi-pct">36.85%</span>
+              </div>
+              <div class="fi-track">
+                <div class="fi-fill" style="--w:36.85%;background:linear-gradient(90deg,#ef4444,#f97316)"></div>
+              </div>
+            </div>
+            <div class="fi-bar-item">
+              <div class="fi-bar-label">
+                <span class="fi-dot" style="background:#6366f1"></span>
+                <span>Cement</span>
+                <span class="fi-pct">25.75%</span>
+              </div>
+              <div class="fi-track">
+                <div class="fi-fill" style="--w:25.75%;background:linear-gradient(90deg,#6366f1,#8b5cf6)"></div>
+              </div>
+            </div>
+            <div class="fi-bar-item">
+              <div class="fi-bar-label">
+                <span class="fi-dot" style="background:#10b981"></span>
+                <span>Superplasticizer</span>
+                <span class="fi-pct">9.50%</span>
+              </div>
+              <div class="fi-track">
+                <div class="fi-fill" style="--w:9.50%;background:linear-gradient(90deg,#10b981,#06b6d4)"></div>
+              </div>
+            </div>
+            <div class="fi-bar-item">
+              <div class="fi-bar-label">
+                <span class="fi-dot" style="background:#0ea5e9"></span>
+                <span>Water</span>
+                <span class="fi-pct">8.28%</span>
+              </div>
+              <div class="fi-track">
+                <div class="fi-fill" style="--w:8.28%;background:linear-gradient(90deg,#0ea5e9,#06b6d4)"></div>
+              </div>
+            </div>
+            <div class="fi-bar-item">
+              <div class="fi-bar-label">
+                <span class="fi-dot" style="background:#8b5cf6"></span>
+                <span>Slag</span>
+                <span class="fi-pct">8.19%</span>
+              </div>
+              <div class="fi-track">
+                <div class="fi-fill" style="--w:8.19%;background:linear-gradient(90deg,#8b5cf6,#6366f1)"></div>
+              </div>
+            </div>
+            <div class="fi-bar-item">
+              <div class="fi-bar-label">
+                <span class="fi-dot" style="background:#f97316"></span>
+                <span>Fine Aggregate</span>
+                <span class="fi-pct">4.81%</span>
+              </div>
+              <div class="fi-track">
+                <div class="fi-fill" style="--w:4.81%;background:linear-gradient(90deg,#f97316,#f59e0b)"></div>
+              </div>
+            </div>
+            <div class="fi-bar-item">
+              <div class="fi-bar-label">
+                <span class="fi-dot" style="background:#06b6d4"></span>
+                <span>Fly Ash</span>
+                <span class="fi-pct">3.48%</span>
+              </div>
+              <div class="fi-track">
+                <div class="fi-fill" style="--w:3.48%;background:linear-gradient(90deg,#06b6d4,#0ea5e9)"></div>
+              </div>
+            </div>
+            <div class="fi-bar-item">
+              <div class="fi-bar-label">
+                <span class="fi-dot" style="background:#f59e0b"></span>
+                <span>Coarse Aggregate</span>
+                <span class="fi-pct">3.13%</span>
+              </div>
+              <div class="fi-track">
+                <div class="fi-fill" style="--w:3.13%;background:linear-gradient(90deg,#f59e0b,#f97316)"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Model Architecture Card -->
+        <div class="insight-card arch-card">
+          <div class="card-header">
+            <div class="card-icon cyan">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="5" r="3" />
+                <circle cx="5" cy="19" r="3" />
+                <circle cx="19" cy="19" r="3" />
+                <path d="M12 8v8M12 8l-5.5 8M12 8l5.5 8" />
+              </svg>
+            </div>
+            <h3>Model Architecture</h3>
+            <span class="card-badge">ExtraTreesRegressor</span>
+          </div>
+          <div class="arch-params">
+            <div class="param-row">
+              <span class="param-name">Algorithm</span>
+              <span class="param-val mono">Extra Trees Regressor</span>
+            </div>
+            <div class="param-row">
+              <span class="param-name">n_estimators</span>
+              <span class="param-val mono accent-val">300 trees</span>
+            </div>
+            <div class="param-row">
+              <span class="param-name">max_features</span>
+              <span class="param-val mono">1.0 (all)</span>
+            </div>
+            <div class="param-row">
+              <span class="param-name">min_samples_split</span>
+              <span class="param-val mono">2</span>
+            </div>
+            <div class="param-row">
+              <span class="param-name">Split Strategy</span>
+              <span class="param-val mono">Fully Random</span>
+            </div>
+            <div class="param-row">
+              <span class="param-name">Aggregation</span>
+              <span class="param-val mono">Mean of 300</span>
+            </div>
+            <div class="param-row highlight">
+              <span class="param-name">R² Score</span>
+              <span class="param-val mono glow-text">0.9212</span>
+            </div>
+            <div class="param-row">
+              <span class="param-name">Training Samples</span>
+              <span class="param-val mono">1,030</span>
+            </div>
+            <div class="param-row">
+              <span class="param-name">Features</span>
+              <span class="param-val mono">8 mix parameters</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Extra Trees vs Random Forest comparison -->
+        <div class="insight-card compare-card">
+          <div class="card-header">
+            <div class="card-icon emerald">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M9 11l3 3L22 4" />
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+              </svg>
+            </div>
+            <h3>Why Extra Trees?</h3>
+            <span class="card-badge">vs. Random Forest</span>
+          </div>
+          <div class="compare-table">
+            <div class="compare-header">
+              <span></span>
+              <span class="compare-col active-col">Extra Trees</span>
+              <span class="compare-col">Random Forest</span>
+            </div>
+            <div class="compare-row">
+              <span>Split selection</span>
+              <span class="check-val active-col">Fully random ✓</span>
+              <span class="check-val">Best-of-K</span>
+            </div>
+            <div class="compare-row">
+              <span>Training speed</span>
+              <span class="check-val active-col">Faster ✓</span>
+              <span class="check-val">Slower</span>
+            </div>
+            <div class="compare-row">
+              <span>Variance reduction</span>
+              <span class="check-val active-col">Higher ✓</span>
+              <span class="check-val">Moderate</span>
+            </div>
+            <div class="compare-row">
+              <span>Overfitting risk</span>
+              <span class="check-val active-col">Lower ✓</span>
+              <span class="check-val">Moderate</span>
+            </div>
+            <div class="compare-row">
+              <span>Non-linear data</span>
+              <span class="check-val active-col">Excellent ✓</span>
+              <span class="check-val">Good</span>
+            </div>
+          </div>
+          <p class="compare-note">Extra Trees uses <em>randomly</em> chosen split thresholds rather than searching for
+            optimal ones — resulting in even more variance reduction and faster training, ideal for complex concrete mix
+            interactions.</p>
+        </div>
+
+        <!-- Strength spectrum -->
+        <div class="insight-card spectrum-card">
+          <div class="card-header">
+            <div class="card-icon orange">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path
+                  d="M21 16V8a2 2 0 0 0-1-1.73L13 2.27a2 2 0 0 0-2 0L4 6.27A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73L11 21.73a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.73z" />
+              </svg>
+            </div>
+            <h3>Training Data Insights</h3>
+            <span class="card-badge">Dataset Profile</span>
+          </div>
+          <div class="data-insight-list">
+            <div class="di-row">
+              <div class="di-icon" style="background:rgba(99,102,241,0.15);color:#6366f1">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                </svg>
+              </div>
+              <div>
+                <strong>1,030 real mix samples</strong>
+                <p>Collected from lab experiments with verified compressive strength tests</p>
+              </div>
+            </div>
+            <div class="di-row">
+              <div class="di-icon" style="background:rgba(6,182,212,0.15);color:#06b6d4">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                </svg>
+              </div>
+              <div>
+                <strong>Strength range: 2.3 – 82.6 MPa</strong>
+                <p>Covers lightweight fills to ultra-high-performance structural concrete</p>
+              </div>
+            </div>
+            <div class="di-row">
+              <div class="di-icon" style="background:rgba(16,185,129,0.15);color:#10b981">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+                  <path d="M9 12l2 2 4-4" />
+                </svg>
+              </div>
+              <div>
+                <strong>Age range: 1 – 365 days</strong>
+                <p>Captures early (7-day), standard (28-day) and long-term (91-day+) hydration</p>
+              </div>
+            </div>
+            <div class="di-row">
+              <div class="di-icon" style="background:rgba(245,158,11,0.15);color:#f59e0b">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 20V10M12 20V4M6 20v-6" />
+                </svg>
+              </div>
+              <div>
+                <strong>Yeh (1998) UCI Dataset</strong>
+                <p>Widely used benchmark dataset in civil engineering ML research</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+     CONCRETE GRADES REFERENCE
+══════════════════════════════════════════════ -->
+  <section class="grades-section" id="grades">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">Engineering Reference</div>
+        <h2 class="section-title">Concrete <span class="gradient-text">Grade Reference</span></h2>
+        <p class="section-subtitle">Standard IS 456 / ACI grade classifications with typical applications</p>
+      </div>
+      <div class="grades-grid">
+        <div class="grade-ref-card grade-low">
+          <div class="grade-ref-header">
+            <span class="grade-ref-badge">Low Strength</span>
+            <span class="grade-ref-range">&lt; 20 MPa</span>
+          </div>
+          <div class="grade-ref-title">M10 – M15</div>
+          <div class="grade-ref-uses">
+            <div class="use-item">Plain concrete floors</div>
+            <div class="use-item">Mass filling works</div>
+            <div class="use-item">Non-structural elements</div>
+            <div class="use-item">Levelling courses</div>
+          </div>
+          <div class="grade-ref-bar">
+            <div class="grb-fill" style="width:20%;background:linear-gradient(90deg,#ef4444,#f97316)"></div>
+          </div>
+        </div>
+
+        <div class="grade-ref-card grade-medium">
+          <div class="grade-ref-header">
+            <span class="grade-ref-badge">Medium Strength</span>
+            <span class="grade-ref-range">20 – 40 MPa</span>
+          </div>
+          <div class="grade-ref-title">M20 – M40</div>
+          <div class="grade-ref-uses">
+            <div class="use-item">Residential buildings</div>
+            <div class="use-item">Road pavements</div>
+            <div class="use-item">General RCC structures</div>
+            <div class="use-item">Beams &amp; slabs</div>
+          </div>
+          <div class="grade-ref-bar">
+            <div class="grb-fill" style="width:50%;background:linear-gradient(90deg,#f59e0b,#fbbf24)"></div>
+          </div>
+        </div>
+
+        <div class="grade-ref-card grade-high">
+          <div class="grade-ref-header">
+            <span class="grade-ref-badge">High Strength</span>
+            <span class="grade-ref-range">40 – 60 MPa</span>
+          </div>
+          <div class="grade-ref-title">M40 – M60</div>
+          <div class="grade-ref-uses">
+            <div class="use-item">High-rise buildings</div>
+            <div class="use-item">Bridges &amp; viaducts</div>
+            <div class="use-item">Pre-stressed concrete</div>
+            <div class="use-item">Industrial flooring</div>
+          </div>
+          <div class="grade-ref-bar">
+            <div class="grb-fill" style="width:75%;background:linear-gradient(90deg,#6366f1,#8b5cf6)"></div>
+          </div>
+        </div>
+
+        <div class="grade-ref-card grade-ultra">
+          <div class="grade-ref-header">
+            <span class="grade-ref-badge">Ultra-High</span>
+            <span class="grade-ref-range">&gt; 60 MPa</span>
+          </div>
+          <div class="grade-ref-title">M60+</div>
+          <div class="grade-ref-uses">
+            <div class="use-item">Nuclear structures</div>
+            <div class="use-item">Offshore platforms</div>
+            <div class="use-item">Long-span bridges</div>
+            <div class="use-item">UHPC facades</div>
+          </div>
+          <div class="grade-ref-bar">
+            <div class="grb-fill" style="width:100%;background:linear-gradient(90deg,#06b6d4,#10b981)"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+     FEATURES SECTION
+══════════════════════════════════════════════ -->
+  <section class="features-section" id="features">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">Platform Highlights</div>
+        <h2 class="section-title">Built for <span class="gradient-text">Engineers</span></h2>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon purple">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path
+                d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+            </svg>
+          </div>
+          <h3>92.12% R² Accuracy</h3>
+          <p>Ensemble of 300 Extra Trees, trained and validated on 1030 lab-verified concrete mix samples from UCI
+            benchmark dataset.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon cyan">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+            </svg>
+          </div>
+          <h3>Instant Inference</h3>
+          <p>Flask REST API serves real-time predictions — model loads once at startup, each prediction takes
+            milliseconds regardless of mix complexity.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon emerald">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="12" r="3" />
+              <path
+                d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" />
+            </svg>
+          </div>
+          <h3>Dual Input Modes</h3>
+          <p>Typed form input for precision data entry, or interactive range sliders for real-time exploration of how
+            parameters affect predicted strength.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon orange">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+              <path d="M12 8v4l3 3" />
+            </svg>
+          </div>
+          <h3>4 Quick Presets</h3>
+          <p>Standard M25, High-Strength M60, Eco Blend (slag-heavy), and UHPC mix presets let you benchmark different
+            concrete grades instantly.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon rose">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+            </svg>
+          </div>
+          <h3>Grade Classification</h3>
+          <p>Automatically classifies results into Low, Medium, High, or Ultra-High Performance concrete grades with IS
+            456 / ACI code references.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon indigo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <line x1="18" y1="20" x2="18" y2="10" />
+              <line x1="12" y1="20" x2="12" y2="4" />
+              <line x1="6" y1="20" x2="6" y2="14" />
+            </svg>
+          </div>
+          <h3>Feature Importance</h3>
+          <p>Real Gini importance scores extracted from the trained model — showing curing age (36.85%) and cement
+            (25.75%) as the dominant predictors.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="nav-brand" style="margin-bottom:8px">
+          <div class="nav-logo">
+            <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
+              <rect width="36" height="36" rx="10" fill="url(#fLogo)" />
+              <path d="M9 27V13.5l9-4.5 9 4.5V27" stroke="white" stroke-width="1.8" stroke-linejoin="round" />
+              <path d="M13 27v-7h10v7" stroke="white" stroke-width="1.8" stroke-linejoin="round" />
+              <defs>
+                <linearGradient id="fLogo" x1="0" y1="0" x2="36" y2="36">
+                  <stop offset="0%" stop-color="#6366f1" />
+                  <stop offset="100%" stop-color="#06b6d4" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <span class="nav-title">Neuro<span class="accent">Concrete</span></span>
+        </div>
+        <p>AI-powered concrete compressive strength prediction.<br />Built with Extra Trees Regressor + Flask + Vanilla
+          JS.</p>
+      </div>
+
+      <div class="footer-links">
+        <div class="footer-col">
+          <div class="footer-col-title">Navigate</div>
+          <a href="#predictor">Predictor</a>
+          <a href="#how-it-works">How It Works</a>
+          <a href="#model-insight">Model Details</a>
+          <a href="#grades">Grade Reference</a>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title">Model Info</div>
+          <span>Algorithm: Extra Trees</span>
+          <span>Accuracy: 92.12% R²</span>
+          <span>Trees: 300</span>
+          <span>Features: 8</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Creator Credit ── -->
+    <div class="creator-strip">
+      <div class="creator-card">
+        <div class="creator-avatar">
+          <span>PS</span>
+          <div class="avatar-ring"></div>
+        </div>
+        <div class="creator-info">
+          <div class="creator-label">Model &amp; Application Built by</div>
+          <div class="creator-name">Prakash Sarvaiya</div>
+          <div class="creator-title">Machine Learning Engineer</div>
+        </div>
+        <div class="creator-links">
+          <!-- LinkedIn -->
+          <a href="https://www.linkedin.com/in/Prakashsarvaiya1609" rel="noopener noreferrer"
+            class="creator-link linkedin" id="linkedin-link" aria-label="Connect on LinkedIn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+              <rect x="2" y="9" width="4" height="12" />
+              <circle cx="4" cy="4" r="2" />
+            </svg>
+            <span>LinkedIn</span>
+          </a>
+          <!-- Email -->
+          <a href="mailto:Prakashsarvaiya1609@gmail.com" class="creator-link email" id="email-link"
+            aria-label="Send Email">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+              <polyline points="22,6 12,13 2,6" />
+            </svg>
+            <span>Prakashsarvaiya1609@gmail.com</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>NeuroConcrete · Extra Trees Regressor · Trained on UCI Concrete Dataset</span>
+      <span>Made with ♥ by Prakash Sarvaiya · 92.12% R² Accuracy</span>
+    </div>
+  </footer>
+
+  <script src="/static/js/main.js"></script>
+</body>
+
+</html>
