@@ -27,6 +27,63 @@ const PRESETS = {
 let activeTab = "form";
 
 /* ══════════════════════════════════════════════════════
+   SPLASH SCREEN
+══════════════════════════════════════════════════════ */
+function initSplash() {
+  const splash    = document.getElementById("splash-screen");
+  const fill      = document.getElementById("splash-fill");
+  const status    = document.getElementById("splash-status");
+  const particles = document.getElementById("splash-particles");
+
+  if (!splash) return;
+
+  // Prevent scroll while splash is visible
+  document.body.style.overflow = "hidden";
+
+  // Generate floating ambient dots
+  const colors = ["#6366f1","#06b6d4","#10b981","#8b5cf6","#0ea5e9"];
+  for (let i = 0; i < 18; i++) {
+    const dot = document.createElement("div");
+    dot.className = "splash-dot";
+    const size = Math.random() * 6 + 3;
+    Object.assign(dot.style, {
+      width:  size + "px",
+      height: size + "px",
+      background: colors[Math.floor(Math.random() * colors.length)],
+      left: Math.random() * 100 + "%",
+      top:  Math.random() * 100 + "%",
+      animationDuration: (Math.random() * 5 + 4) + "s",
+      animationDelay:    (Math.random() * 3) + "s",
+    });
+    particles.appendChild(dot);
+  }
+
+  // Progress steps: [targetPct, statusText, delay_ms_from_start]
+  const steps = [
+    { pct: 20, msg: "Initializing model…",      at: 0    },
+    { pct: 45, msg: "Loading feature pipeline…", at: 400  },
+    { pct: 70, msg: "Warming up inference…",     at: 850  },
+    { pct: 90, msg: "Preparing UI…",             at: 1300 },
+    { pct: 100, msg: "Ready!",                   at: 1700 },
+  ];
+
+  steps.forEach(step => {
+    setTimeout(() => {
+      if (fill)   fill.style.width  = step.pct + "%";
+      if (status) status.textContent = step.msg;
+    }, step.at);
+  });
+
+  // Dismiss splash after all steps
+  setTimeout(() => {
+    splash.classList.add("hidden");
+    document.body.style.overflow = "";
+    // Re-enable scroll restore after transition
+    setTimeout(() => { splash.style.display = "none"; }, 750);
+  }, 2200);
+}
+
+/* ══════════════════════════════════════════════════════
    PARTICLE CANVAS
 ══════════════════════════════════════════════════════ */
 function initParticles() {
@@ -93,10 +150,15 @@ function initParticles() {
   }
   animate();
 
+  // Debounced resize to prevent canvas jitter on scroll
+  let resizeTimer;
   window.addEventListener("resize", () => {
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-  });
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }, 150);
+  }, {passive: true});
 }
 
 /* ══════════════════════════════════════════════════════
@@ -104,20 +166,30 @@ function initParticles() {
 ══════════════════════════════════════════════════════ */
 function animateCounters() {
   document.querySelectorAll(".counter-val").forEach(el => {
-    const target = parseFloat(el.dataset.target);
-    const suffix = el.dataset.suffix || "";
+    // Guard: only animate once
+    if (el.dataset.animated) return;
+    el.dataset.animated = "1";
+
+    const target   = parseFloat(el.dataset.target);
+    const suffix   = el.dataset.suffix || "";
     const duration = 1800;
-    const isFloat = target % 1 !== 0;
+    const isFloat  = target % 1 !== 0;
     let start = null;
 
     function step(ts) {
       if (!start) start = ts;
       const progress = Math.min((ts - start) / duration, 1);
-      const ease = 1 - Math.pow(1 - progress, 3);
-      const val = target * ease;
+      const ease     = 1 - Math.pow(1 - progress, 3);
+      const val      = target * ease;
+      // Plain text update — no gradient during animation to avoid flicker
       el.textContent = (isFloat ? val.toFixed(2) : Math.floor(val)) + suffix;
-      if (progress < 1) requestAnimationFrame(step);
-      else el.textContent = (isFloat ? target.toFixed(2) : target) + suffix;
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      } else {
+        // Animation done → snap final value, then apply gradient class
+        el.textContent = (isFloat ? target.toFixed(2) : target) + suffix;
+        el.classList.add("counted");
+      }
     }
     requestAnimationFrame(step);
   });
@@ -403,7 +475,49 @@ function loadPreset(name) {
 ══════════════════════════════════════════════════════ */
 window.addEventListener("scroll", () => {
   document.getElementById("navbar")?.classList.toggle("scrolled", window.scrollY > 30);
+  // Close mobile menu on scroll
+  closeMobileMenu();
 }, {passive:true});
+
+/* ══════════════════════════════════════════════════════
+   MOBILE HAMBURGER MENU
+══════════════════════════════════════════════════════ */
+function closeMobileMenu() {
+  const btn  = document.getElementById("nav-hamburger");
+  const menu = document.getElementById("mobile-menu");
+  if (!btn || !menu) return;
+  btn.classList.remove("open");
+  menu.classList.remove("open");
+  btn.setAttribute("aria-expanded", "false");
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const btn  = document.getElementById("nav-hamburger");
+  const menu = document.getElementById("mobile-menu");
+  if (btn && menu) {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isOpen = menu.classList.contains("open");
+      if (isOpen) {
+        closeMobileMenu();
+      } else {
+        btn.classList.add("open");
+        menu.classList.add("open");
+        btn.setAttribute("aria-expanded", "true");
+      }
+    });
+  }
+  // Close menu when clicking outside
+  document.addEventListener("click", (e) => {
+    const menu = document.getElementById("mobile-menu");
+    if (menu && menu.classList.contains("open")) {
+      if (!menu.contains(e.target) && e.target.id !== "nav-hamburger") {
+        closeMobileMenu();
+      }
+    }
+  });
+});
+
 
 /* ══════════════════════════════════════════════════════
    SMOOTH SCROLL NAV LINKS
@@ -414,6 +528,8 @@ document.addEventListener("click", e => {
     e.preventDefault();
     const target = document.querySelector(link.getAttribute("href"));
     if (target) target.scrollIntoView({behavior:"smooth", block:"start"});
+    // Close mobile menu if open
+    closeMobileMenu();
   }
 });
 
@@ -428,6 +544,7 @@ document.addEventListener("keydown", e => {
    INIT
 ══════════════════════════════════════════════════════ */
 document.addEventListener("DOMContentLoaded", () => {
+  initSplash();      // ← initialization splash screen
   initParticles();
   initSliders();
   initScrollReveal();
