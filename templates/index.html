@@ -17,6 +17,36 @@
 
 <body>
 
+  <!-- ══ Splash / Initialization Screen ══ -->
+  <div id="splash-screen" aria-live="polite" role="status">
+    <!-- Floating background dots -->
+    <div class="splash-particles" id="splash-particles"></div>
+
+    <!-- Logo -->
+    <div class="splash-logo">
+      <div class="splash-logo-bg"></div>
+      <svg width="52" height="52" viewBox="0 0 36 36" fill="none">
+        <path d="M9 27V13.5l9-4.5 9 4.5V27" stroke="white" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M13 27v-7h10v7" stroke="white" stroke-width="1.8" stroke-linejoin="round"/>
+        <circle cx="18" cy="11" r="2.2" fill="white" opacity="0.95"/>
+      </svg>
+    </div>
+
+    <!-- Brand -->
+    <div class="splash-brand">
+      <div class="splash-brand-name">NeuroConcrete</div>
+      <div class="splash-brand-tag">AI Strength Predictor</div>
+    </div>
+
+    <!-- Progress -->
+    <div class="splash-progress-wrap">
+      <div class="splash-progress-track">
+        <div class="splash-progress-fill" id="splash-fill"></div>
+      </div>
+      <div class="splash-status" id="splash-status">Initializing model…</div>
+    </div>
+  </div>
+
   <!-- ── Particle Canvas ── -->
   <canvas id="particle-canvas"></canvas>
 
@@ -58,7 +88,20 @@
       <span class="pulse-dot"></span>
       <span>92.12% Accuracy · Live</span>
     </div>
+    <!-- Mobile hamburger -->
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
   </nav>
+
+  <!-- Mobile menu drawer -->
+  <div class="mobile-menu" id="mobile-menu" role="navigation">
+    <a href="#predictor">Predictor</a>
+    <a href="#how-it-works">How It Works</a>
+    <a href="#model-insight">Model</a>
+    <a href="#grades">Grades</a>
+  </div>
+
 
   <!-- ══════════════════════════════════════════════
      HERO SECTION
